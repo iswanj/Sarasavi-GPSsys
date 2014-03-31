@@ -1,0 +1,39 @@
+<?php header("content-type:text/xml"); ?>
+<?php 
+	require_once '../includes/session.php';
+	require_once '../includes/connection.php';
+	require_once '../classes/Client.php';
+	require_once '../classes/User.php';
+?>
+<locations xml:lang="EN">
+<?php
+	if(isset($_GET['vid'])){
+		$user = new User();
+		$groupid = $user->userGroupId;
+		$date = date("Y-m-d");
+		$locations = Client::getClientbyId($_GET['vid']);
+	        $timezone = "Asia/Colombo";
+		if(function_exists('date_default_timezone_set')) date_default_timezone_set($timezone);
+		$curtime = date("H:i:s");
+		$list = $locations->fetch(PDO::FETCH_ASSOC);
+		echo '<tracker>';
+			echo '<imei>' . $list['imei'] . '</imei>';
+			echo '<name>' . $list['client_name'] . '</name>';
+			echo '<lat>' . $list['lat'] . '</lat>';
+			echo '<lng>' . $list['lng'] . '</lng>';
+			echo '<signal>' . $list['signal'] . '</signal>';
+			echo '<cid>' . $list['imei'] . '</cid>';
+			echo '<speed>' . $list['speed'] . '</speed>';
+		echo '</tracker>';
+		$all_location = Client::getAllClientLocations($_GET['vid'],'2012-09-05');
+		echo '<locationsList>';
+			while($listlocation = $all_location->fetch(PDO::FETCH_ASSOC)):
+				echo '<loc>';
+					echo '<clat>' . $listlocation['lat'] . '</clat>';
+					echo '<clng>' . $listlocation['lng'] . '</clng>';
+				echo '</loc>';
+			endwhile;
+		echo '</locationsList>';
+	}
+?>
+</locations>
